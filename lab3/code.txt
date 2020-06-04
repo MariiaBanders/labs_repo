@@ -1,0 +1,99 @@
+#include <vector>
+#include <random>
+#iclude <iostream>
+
+int randomInt(int begin, int end) {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<> dis(begin, end);
+    return dis(gen);
+}
+
+double middle(const std::vector<int>& vec) {
+    double middle = 0;
+    for (const auto& item : vec) {
+        middle += item;
+    }
+    return middle/vec.size();
+}
+
+template <class iter>
+void swap_iter(iter& lhs, iter& rhs) {
+    auto temp = *rhs;
+    *rhs = *lhs;
+    *lhs = temp;
+}
+
+template <class iter>
+iter partition(iter begin, iter end)
+{
+    int size = end - begin - 1;
+    int r = randomInt(0, size);
+    iter random = r + begin;
+    iter pivot = end - 1;
+    swap_iter(random, pivot);
+    iter i = begin;
+    for (iter j = begin; j <= end - 2; j++) {
+        if (*j <= *pivot) {
+            swap_iter(i, j);
+            ++i;
+        }
+    }
+    iter new_pivot = i;
+    swap_iter(new_pivot, pivot);
+    return new_pivot;
+}
+
+template <class iter>
+void quickSort(iter begin, iter end) {
+    if (begin < end) {
+        iter pivot = partition(begin, end);
+        quickSort(begin, pivot);
+        quickSort(pivot + 1, end);
+    }
+}
+
+double median(const std::vector<int>& vec) {
+    auto copy = vec;
+    quickSort(begin(copy), end(copy));
+    if (copy.size() % 2 == 0) {
+        return (copy[copy.size()/2 - 1] + copy[copy.size()/2])/2.0;
+    }
+    return copy[(int)copy.size()/2];
+}
+
+int max(const std::vector<int>& vec) {
+    int max = INT32_MIN;
+    for (const auto& item : vec) {
+        if (max < item) {
+            max = item;
+        }
+    }
+    return max;
+}
+
+int min(const std::vector<int>& vec) {
+    int min = INT32_MAX;
+    for (const auto& item : vec) {
+        if (min > item) {
+            min = item;
+        }
+    }
+    return min;
+}
+
+
+int main() {
+    std::vector<int> vec = {1, 4, 3, 6, 2};
+    quickSort(begin(vec), end(vec));
+    for (auto item : vec) {
+        std::cout <<  item << " ";
+    }std::cout << '\n';
+
+    std::cout << min(vec) << '\n';
+    std::cout << max(vec) << '\n';
+    std::cout << median(vec) << '\n';
+    std::cout << middle(vec) << '\n';
+
+    return 0;
+}
